@@ -21,7 +21,7 @@ This chatbot uses below tech stack
 ## Installation
 
 ### Create a virtual environment
-- Make sure you have atleast python 3.10 installed on your system and git a client
+- Make sure you have atleast python 3.10 installed on your system and a git client
 - Execute command ```git clone https://github.com/pradeeptyagi23/chat-with-websites.git```
 - This will create a folder chat-with-websites on the path where the git clone command was executed
 - ```cd chat-with-websites```
