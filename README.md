@@ -20,23 +20,19 @@ This chatbot uses below tech stack
 
 ## Installation
 
-Currently it doesnt support any fancy way of installation as this is a work in progress.
-But below packages are installed  before running the code.
-- pip install beautifulsoup4 (scraping the website)
-- pip install python-dotenv
-- pip install streamlit(user interface)
-- pip install langchain(interface with the model)
-- pip install langchain_openai(langchain partner package for openai)
-- pip install chromadb
-
-Also , dont forget to add your openAI API key in the .env of your project root as :
-OPENAI_API_KEY=<openAI-API-Key>
-
-Once all the required packages are installed and the open AI API key is specified.
-It can run as 
-```
-streamlit run src/app.py
-```
-This will open the chabot on the localhost.And is ready to use
+### Create a virtual environment
+- Make sure you have atleast python 3.10 installed on your system and git a client
+- Execute command ```git clone https://github.com/pradeeptyagi23/chat-with-websites.git```
+- This will create a folder chat-with-websites on the path where the git clone command was executed
+- ```cd chat-with-websites```
+- Create a virtual environment with the command ```python -m venv venv```
+- This will create a virtual environment 'venv' inside the project folder
+- Activate the virtual environment with command ```source venv/bin/activate```
+- Now from the project root folder, run the command ```pip install -r requirements.txt```
+- This will install all required dependencies.
+- Create .env in the project root folder to add the openAI API key. (Checkout .env.example to see an example)
+- Next, execute command ```streamlit run src/app.py``` from the project root folder.
+- This will open up the chatbot window on your localhost
+- Happy chatting with the chatbot.
 
 ![image](https://github.com/pradeeptyagi23/chat-with-websites/assets/8380756/dda1444c-4a39-4e0c-8230-4e5c3e835a79)
