@@ -1,0 +1,27 @@
+# Packages installed
+beautifulsoup4 (scraping the website)
+python-dotenv
+streamlit(user interface)
+langchain(interface with the model)
+langchain_openai(langchain partner package for openai)
+chromadb
+
+# streamlit notes
+chat_input = used to get input message that can be stored in a variable
+chat_message = provides a container in which st.write can be used
+chat_history = should be included in session_state to create conversation
+chat_history will be a list of AI or Human message. These are schemas that come from the langchain core messages library
+
+# RAG
+Retrieval Augemented Generation = Augment the knowledge of the llm with the context that is retrieved from a custom knowledge base
+
+1. Load documents
+2. Split documents.
+3. Create vectorstore by embedding the document chunks and adding to the vector store
+4. Create context aware retriever chain, which will be a chain of entire chat history along with user query to get the most relevant documents from the vectore store.
+    i. Initialize the language model
+    ii. Get retriever(handler) to the vector store
+    ii. Initialize the prompt for the contextual retrieval chain . The prompt takes the chat_history, user_query and user input that asks the model to create a look up query to get information relevant to the conversation. 
+    iii. Get the retriever chain passing the llm, retriever and the prompt. This is only a chain to create embeddings from the prompt and get the relevant documents from the vector store.
+5. Create the final chain.
+    i. Pass the history aware retriever chain + prompt(user_input+chat_history) to the llm to retrive the most relevant answer from the relevant documents in the history aware retriever chain created in step 4.
