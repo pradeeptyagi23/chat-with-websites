@@ -39,4 +39,5 @@ This chatbot uses below tech stack
 - This will open up the chatbot window on your localhost
 - Happy chatting with the chatbot.
 
-![image](https://github.com/pradeeptyagi23/chat-with-websites/assets/8380756/dda1444c-4a39-4e0c-8230-4e5c3e835a79)
+![chatbot](https://github.com/pradeeptyagi23/chat-with-websites/assets/8380756/adf5ea20-346b-447f-9a02-55562e0d92d8)
+
