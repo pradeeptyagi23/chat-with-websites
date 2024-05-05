@@ -28,9 +28,13 @@ This chatbot uses below tech stack
 - Create a virtual environment with the command ```python -m venv venv```
 - This will create a virtual environment 'venv' inside the project folder
 - Activate the virtual environment with command ```source venv/bin/activate```
+
+### Install dependencies
 - Now from the project root folder, run the command ```pip install -r requirements.txt```
 - This will install all required dependencies.
 - Create .env in the project root folder to add the openAI API key. (Checkout .env.example to see an example)
+
+### Run the streamlit app
 - Next, execute command ```streamlit run src/app.py``` from the project root folder.
 - This will open up the chatbot window on your localhost
 - Happy chatting with the chatbot.
