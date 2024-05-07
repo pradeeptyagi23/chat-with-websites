@@ -9,6 +9,8 @@ from langchain_openai.chat_models import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate,MessagesPlaceholder
 from langchain.chains import create_history_aware_retriever,create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
+from lib.storage import Document
+from lib.vectorstore import VectorStore
 
 __import__('pysqlite3')
 import sys
@@ -18,15 +20,14 @@ load_dotenv()
 
 
 def get_vectorstore_from_url(url):
-    # load the document
-    loader = WebBaseLoader(url)
-    document = loader.load()
-    # Split the document
-    text_splitter = RecursiveCharacterTextSplitter()
-    document_chunks = text_splitter.split_documents(documents=document)
 
-    #embed document chunks and create a vectorstore from chunks 
-    vector_store = Chroma.from_documents(documents=document_chunks,embedding=OpenAIEmbeddings())
+    # load the document and get the chunks
+    doc_obj = Document(doc_type="web",source=url)
+    chunks = doc_obj.split_documents()
+
+    # get the vector from the chunks
+    vector_store_obj = VectorStore(doc_chunks=chunks)
+    vector_store = vector_store_obj.get_vectorstore()
 
     return vector_store
 
