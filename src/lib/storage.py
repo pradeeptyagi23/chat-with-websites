@@ -1,39 +1,29 @@
-from pydantic import BaseModel,Field
+from pydantic import BaseModel
 from langchain.document_loaders.web_base import WebBaseLoader
-from langchain.document_loaders.pdf import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from abc import ABC,abstractmethod
 
-class Document(BaseModel):
-    doc_type: str = Field(default="web" or "pdf",validate_default=True)
-    source: str
+class Document(ABC,BaseModel):
+    source:str
+    @abstractmethod
+    def load():
+        pass
 
-    def __load_document(self):
-        print("in load documents")
+class WebDocument(Document):
+    def load(self):
         try:
-            if(self.doc_type == "web"):
-                loader  = WebBaseLoader(self.source)
-            elif(self.doc_type == "pdf"):
-                loader = PyPDFLoader(self.source)
+            loader  = WebBaseLoader(self.source)
             document = loader.load()
+            text_splitter = RecursiveCharacterTextSplitter()
+            chunked_docs = text_splitter.split_documents(document)            
         except:
             print("Failed to load document")
-        else:
-            return document
-
-        
-    def split_documents(self):
-        try:
-            document = self.__load_document()
-            text_splitter = RecursiveCharacterTextSplitter()
-            chunked_docs = text_splitter.split_documents(document)
-        except Exception as e:
-            print("Failed to split documents" +str(e))
         else:
             return chunked_docs
 
 
-
 # if "__name__" == "__name__":
-#     documentObj = Document(doc_type="web",source="https://python.org")
-#     chunks = documentObj.split_documents()
-#     print(chunks)
+#     webDocObj = WebDocument(source="https://python.org")
+#     print(webDocObj.load())
+#     # chunks = documentObj.split_documents()
+#     # print(chunks)

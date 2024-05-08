@@ -1,16 +1,14 @@
 from dotenv import load_dotenv
 import streamlit as st
 from langchain_core.messages import AIMessage,HumanMessage 
-from langchain_community.document_loaders.web_base import WebBaseLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores.chroma import Chroma
-from langchain_openai.embeddings import OpenAIEmbeddings
 from langchain_openai.chat_models import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate,MessagesPlaceholder
 from langchain.chains import create_history_aware_retriever,create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
-from lib.storage import Document
-from lib.vectorstore import VectorStore
+from lib.storage import WebDocument
+from lib.vectorstore import chromaVectorStore
+from lib.prompts import ChatPromptTmpl
+from lib.chains import ContextualRetrievalChain
 
 __import__('pysqlite3')
 import sys
@@ -22,22 +20,28 @@ load_dotenv()
 def get_vectorstore_from_url(url):
 
     # load the document and get the chunks
-    doc_obj = Document(doc_type="web",source=url)
-    chunks = doc_obj.split_documents()
+    doc_obj = WebDocument(source=url)
+    chunks = doc_obj.load()
 
     # get the vector from the chunks
-    vector_store_obj = VectorStore(doc_chunks=chunks)
+    vector_store_obj = chromaVectorStore(documents=chunks)
     vector_store = vector_store_obj.get_vectorstore()
 
     return vector_store
 
-def get_context_retriever_chain(vector_store):
+    system_input = """
+        Given the above conversation,generate a search query to lookup 
+        in order to get information relevant to the conversation
+    """
+    chainObj = ContextualRetrievalChain(system_input=system_input,llm=ChatOpenAI(),vectorstore=vector_store)
+
     retriever = vector_store.as_retriever()
     llm = ChatOpenAI()
+
     prompt = ChatPromptTemplate.from_messages([
         MessagesPlaceholder(variable_name="chat_history"),
         ("user","{input}"),
-        ("user","Given the above conversation,generate a search query to lookup in order to get information relevant to the conversation")
+        ("system","Given the above conversation,generate a search query to lookup in order to get information relevant to the conversation")
     ])
 
     retriever_chain = create_history_aware_retriever(llm,retriever,prompt)
@@ -57,7 +61,13 @@ def get_conversational_rag_chain(retriever_chain):
 
 def get_response(user_query):
     #create conversation chain    
-    retriever_chain = get_context_retriever_chain(st.session_state.vector_store)
+    # retriever_chain = get_context_retriever_chain(st.session_state.vector_store)
+    system_input = """
+        Given the above conversation,generate a search query to lookup 
+        in order to get information relevant to the conversation
+    """
+    chainObj = ContextualRetrievalChain(system_input=system_input,llm=ChatOpenAI(),vector_store=st.session_state.vector_store)
+    retriever_chain = chainObj.get_context_retriever_chain()
     conversation_rag_chain = get_conversational_rag_chain(retriever_chain)
 
     response = conversation_rag_chain.invoke({
