@@ -8,7 +8,7 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 from lib.storage import WebDocument
 from lib.vectorstore import chromaVectorStore
 from lib.prompts import ChatPromptTmpl
-from lib.chains import ContextualRetrievalChain
+from lib.chains import ContextualRetrievalChain,ConversationalRetrievalChain
 
 __import__('pysqlite3')
 import sys
@@ -47,17 +47,17 @@ def get_vectorstore_from_url(url):
     retriever_chain = create_history_aware_retriever(llm,retriever,prompt)
     return retriever_chain
 
-def get_conversational_rag_chain(retriever_chain):
-    llm = ChatOpenAI()
-    prompt = ChatPromptTemplate.from_messages([
-        ("system","Answer the user's question based on the below context. Only answer based on the context. Do not refer to other sources. If you do not know the answer, reply with a formal message to convey that you dont have the answer based on the source\n\n{context}"),
-        MessagesPlaceholder(variable_name="chat_history"),
-        ("user","{input}")
-    ])
+# def get_conversational_rag_chain(retriever_chain):
+#     llm = ChatOpenAI()
+#     prompt = ChatPromptTemplate.from_messages([
+#         ("system","Answer the user's question based on the below context. Only answer based on the context. Do not refer to other sources. If you do not know the answer, reply with a formal message to convey that you dont have the answer based on the source\n\n{context}"),
+#         MessagesPlaceholder(variable_name="chat_history"),
+#         ("user","{input}")
+#     ])
 
-    #chain the history aware retriver chain with the document chain.
-    stuff_documents_chain = create_stuff_documents_chain(llm,prompt=prompt)
-    return create_retrieval_chain(retriever_chain,stuff_documents_chain)
+#     #chain the history aware retriver chain with the document chain.
+#     stuff_documents_chain = create_stuff_documents_chain(llm,prompt=prompt)
+#     return create_retrieval_chain(retriever_chain,stuff_documents_chain)
 
 def get_response(user_query):
     #create conversation chain    
@@ -68,7 +68,14 @@ def get_response(user_query):
     """
     chainObj = ContextualRetrievalChain(system_input=system_input,llm=ChatOpenAI(),vector_store=st.session_state.vector_store)
     retriever_chain = chainObj.get_context_retriever_chain()
-    conversation_rag_chain = get_conversational_rag_chain(retriever_chain)
+
+    system_input = """
+    Answer the user's question based on the below context. Only answer based on the context. Do not refer to other sources. 
+    If you do not know the answer, reply with a formal message to convey that you dont have the answer based on the source
+    """
+    conversationalChainObj = ConversationalRetrievalChain(retriever_chain=retriever_chain,system_input=system_input)
+    conversation_rag_chain = conversationalChainObj.get_conversational_rag_chain()
+    # conversation_rag_chain = get_conversational_rag_chain(retriever_chain)
 
     response = conversation_rag_chain.invoke({
         "chat_history":st.session_state.chat_history,

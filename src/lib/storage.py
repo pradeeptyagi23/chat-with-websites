@@ -15,7 +15,7 @@ class WebDocument(Document):
             loader  = WebBaseLoader(self.source)
             document = loader.load()
             text_splitter = RecursiveCharacterTextSplitter()
-            chunked_docs = text_splitter.split_documents(document)            
+            chunked_docs = text_splitter.split_documents(document)         
         except:
             print("Failed to load document")
         else:
